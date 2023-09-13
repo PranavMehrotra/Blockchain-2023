@@ -1,0 +1,211 @@
+1)
+curl https://goerli.infura.io/v3/bb9a7bde227c4446afd8d7a23d806d94 \
+    -X POST \
+    -H "Content-Type: application/json" \
+    --data '{"jsonrpc":"2.0","method":"eth_gasPrice","params": [],"id":1}'
+
+Answer A.1:
+Answer:1101
+JSONRPCpayload: {"jsonrpc":"2.0","method":"eth_gasPrice","params": [],"id":1}
+Response:{"jsonrpc":"2.0","id":1,"result":"0x44d"}
+
+2)
+curl https://goerli.infura.io/v3/bb9a7bde227c4446afd8d7a23d806d94 \
+    -X POST \
+    -H "Content-Type: application/json" \
+    --data '{"jsonrpc": "2.0", "id": 1, "method": "eth_blockNumber", "params": []}'
+    
+Answer A.2:
+Answer:9663649
+JSONRPCpayload:{"jsonrpc": "2.0", "id": 1, "method": "eth_blockNumber", "params": []}
+Response: {"jsonrpc":"2.0","id":1,"result":"0x9374a1"}
+
+
+3)
+curl https://goerli.infura.io/v3/bb9a7bde227c4446afd8d7a23d806d94\
+    -X POST \
+    -H "Content-Type: application/json" \
+    --data '{"jsonrpc":"2.0","method":"eth_getBalance","params": ["0xBaF6dC2E647aeb6F510f9e318856A1BCd66C5e19", "latest"],"id":1}'
+Answer A.3:
+Answer:1141819585802838800
+JSONRPCpayload:{"jsonrpc":"2.0","method":"eth_getBalance","params": ["0xBaF6dC2E647aeb6F510f9e318856A1BCd66C5e19", "latest"],"id":1}
+Response:{"jsonrpc":"2.0","id":1,"result":"0xfd88edd195ca310"}
+
+
+4)for mainnet
+curl https://mainnet.infura.io/v3/bb9a7bde227c4446afd8d7a23d806d94 \
+    -X POST \
+    -H "Content-Type: application/json" \
+    -d '{
+        "jsonrpc":"2.0",
+        "method":"eth_getTransactionReceipt",
+        "params": ["0xdcae4a84a5780f62f18a9afb07b3a7627b9a28aa128a76bfddec72de9a0c2606"],
+        "id":1
+    }'
+Answer A.4:
+1)0
+2)29901491478085619
+3)JSONRPCpayload: 
+    {
+        "jsonrpc":"2.0",
+        "method":"eth_getTransactionByHash",
+        "params": ["0xdcae4a84a5780f62f18a9afb07b3a7627b9a28aa128a76bfddec72de9a0c2606"],
+        "id":1
+    }
+    {
+        "jsonrpc":"2.0",
+        "method":"eth_getTransactionReceipt",
+        "params":["0xdcae4a84a5780f62f18a9afb07b3a7627b9a28aa128a76bfddec72de9a0c2606"],
+        "id":1
+    }
+    {
+        "jsonrpc":"2.0",
+        "method":"eth_getBlockByHash",
+        "params":["0x53d920959cf1ee6f569fcdeba03c9d91c54f4c34e893cd937536f7ae8c60be9a", true],
+        "id":1
+    }
+Response:
+    {
+        "jsonrpc":"2.0",
+        "id":1,
+        "result":
+        {
+            "accessList":[],
+            "blockHash":"0x53d920959cf1ee6f569fcdeba03c9d91c54f4c34e893cd937536f7ae8c60be9a",
+            "blockNumber":"0x1132aea",
+            "chainId":"0x1",
+            "from":"0xbaf6dc2e647aeb6f510f9e318856a1bcd66c5e19",
+            "gas":"0x565f",
+            "gasPrice":"0x4cc13ee7c",
+            "hash":"0xdcae4a84a5780f62f18a9afb07b3a7627b9a28aa128a76bfddec72de9a0c2606",
+            "input":"0x",
+            "maxFeePerGas":"0x4cc13ee7c",
+            "maxPriorityFeePerGas":"0x0",
+            "nonce":"0xbf4a",
+            "r":"0x3c54f1d468465af6d4ad737ca626399a3b8180a510479585873531b5cfe0443e",
+            "s":"0x7dc4757678d30c50ce1932c9d0603274cfcb6719c64c0c1603834a43eadbf961",
+            "to":"0x388c818ca8b9251b393131c08a736a67ccb19297",
+            "transactionIndex":"0x73",
+            "type":"0x2",
+            "v":"0x0",
+            "value":"0x6a3b3f81ce3ff3",
+            "yParity":"0x0"
+        }
+    }
+    {
+        "jsonrpc":"2.0","id":1,
+        "result":
+                {
+                    "blockHash":"0x53d920959cf1ee6f569fcdeba03c9d91c54f4c34e893cd937536f7ae8c60be9a",
+                    "blockNumber":"0x1132aea",
+                    "contractAddress":null,
+                    "cumulativeGasUsed":"0xfbabbf",
+                    "effectiveGasPrice":"0x4cc13ee7c",
+                    "from":"0xbaf6dc2e647aeb6f510f9e318856a1bcd66c5e19",
+                    "gasUsed":"0x565f",
+                    "logs":
+                        [{
+                            "address":"0x388c818ca8b9251b393131c08a736a67ccb19297",
+                            "blockHash":"0x53d920959cf1ee6f569fcdeba03c9d91c54f4c34e893cd937536f7ae8c60be9a",
+                            "blockNumber":"0x1132aea",
+                            "data":"0x000000000000000000000000000000000000000000000000006a3b3f81ce3ff3",
+                            "logIndex":"0x168",
+                            "removed":false,
+                            "topics":["0x27f12abfe35860a9a927b465bb3d4a9c23c8428174b83f278fe45ed7b4da2662"],
+                            "transactionHash":"0xdcae4a84a5780f62f18a9afb07b3a7627b9a28aa128a76bfddec72de9a0c2606",
+                            "transactionIndex":"0x73"
+                        }],
+                    "logsBloom":"0x00000000000000000000000000000000000100004000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000000000000000800000000000000000000000000000000000000000000000000000000000",
+                    "status":"0x1",
+                    "to":"0x388c818ca8b9251b393131c08a736a67ccb19297",
+                    "transactionHash":"0xdcae4a84a5780f62f18a9afb07b3a7627b9a28aa128a76bfddec72de9a0c2606",
+                    "transactionIndex":"0x73",
+                    "type":"0x2"
+                }
+    }
+
+4) for goerli
+(no such transaction)
+No.of transactions prior to this by same sender: NULL
+Value Transferred: NULL 
+JSON RPC payload: 
+    {
+        "jsonrpc":"2.0",
+        "method":"eth_getTransactionByHash",
+        "params": ["0xdcae4a84a5780f62f18a9afb07b3a7627b9a28aa128a76bfddec72de9a0c2606"],
+        "id":1
+    }
+Response:
+{"jsonrpc":"2.0","id":1,"result":null}
+
+5)
+curl https://goerli.infura.io/v3/bb9a7bde227c4446afd8d7a23d806d94 \
+    -X POST \
+    -H "Content-Type: application/json" \
+    -d '{
+    "jsonrpc":"2.0",
+    "method":"net_peerCount",
+    "params":[],
+    "id":1
+}'
+Answer: 100
+JSON RPC payload:{
+    "jsonrpc":"2.0",
+    "method":"net_peerCount",
+    "params":[],
+    "id":1
+}
+Response: {"jsonrpc":"2.0","id":1,"result":"0x64"}
+
+
+6)
+curl https://mainet.infura.io/v3/bb9a7bde227c4446afd8d7a23d806d94 \
+    -X POST \
+    -H "Content-Type: application/json" \
+    -d '{
+        "jsonrpc":"2.0",
+        "method":"eth_getTransactionReceipt",
+        "params": ["0x5d692282381c75786e5f700c297def496e8e54f0a96d5a4447035f75085933cb"],
+        "id":1
+    }'
+Block Number: 18033386
+Block Hash:   0x53d920959cf1ee6f569fcdeba03c9d91c54f4c34e893cd937536f7ae8c60be9a
+cumulativeGasUsed: 16298877
+transactionIndex: 111
+
+for goerli
+NULL
+
+7)
+curl https://goerli.infura.io/v3/bb9a7bde227c4446afd8d7a23d806d94 \
+    -X POST \
+    -H "Content-Type: application/json" \
+    -d '{
+    "jsonrpc":"2.0",
+    "method":"eth_getBlockTransactionCountByNumber",
+    "params":["0x1132aea"],
+    "id":1
+}'
+Answer: {"jsonrpc":"2.0","id":1,"result":null} for goerli
+
+for mainnet
+curl https://mainnet.infura.io/v3/bb9a7bde227c4446afd8d7a23d806d94 \
+    -X POST \
+    -H "Content-Type: application/json" \
+    -d '{
+    "jsonrpc":"2.0",
+    "method":"eth_getBlockTransactionCountByNumber",
+    "params":["0x1132aea"],
+    "id":1
+}'
+
+Answer:
+No. of transaction:116
+JSON RPC payload: {
+    "jsonrpc":"2.0",
+    "method":"eth_getBlockTransactionCountByNumber",
+    "params":["0x1132aea"],
+    "id":1
+}
+Response: {"jsonrpc":"2.0","id":1,"result":"0x74"}
+
