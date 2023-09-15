@@ -1,2 +1,3 @@
 1. Smart Contract Address(Killed): 0x887C6d7287e09A335BA7860D226D58860546CDBe
-2. Smart Contract Address(Alive): 0x96b838Cf9Af759522161427678BE89acb37c527e
+2. Smart Contract Address(Killed): 0x96b838Cf9Af759522161427678BE89acb37c527e
+3. Smart Contract Address(Alive): 0x4d49092da1C9Ce60c3DD105E3524312E72476b2b

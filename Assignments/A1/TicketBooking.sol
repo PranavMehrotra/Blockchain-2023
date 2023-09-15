@@ -16,6 +16,11 @@ contract TicketBooking {
     mapping (address => Buyer) buyersPaid;
     bool isSoldOut;
 
+    // Events: Deposit and Refund
+    event Deposit(address from, uint256 amount);
+    event Refund(address to, uint256 amount);
+
+
     constructor(uint256 _quota, uint256 _price) {
         seller = msg.sender;
         numTicketsSold = 0;
@@ -51,6 +56,7 @@ contract TicketBooking {
             uint256 refundAmount = msg.value - totalCost;
             payable(msg.sender).transfer(refundAmount);
         }
+        emit Deposit(msg.sender, totalCost);
     }
 
     modifier soldOut() {
@@ -76,6 +82,7 @@ contract TicketBooking {
         isSoldOut = false; // Reset sold out status
         delete buyersPaid[buyer];
         payable(buyer).transfer(refundAmount);
+        emit Refund(buyer, refundAmount);
     }
 
     function getBuyerAmountPaid(address buyer) public view returns (uint256) {
