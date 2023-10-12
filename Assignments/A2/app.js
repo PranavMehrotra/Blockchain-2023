@@ -4,7 +4,6 @@ const path = require('path');
 const readline = require('readline');
 const os = require('os');
 
-// input rootPath
 const rootPath = os.homedir() + '/Desktop/BTP/Fabric/fabric-samples/test-network'
 // console.log(rootPath);
 
@@ -43,7 +42,7 @@ async function main() {
     const channelName = 'mychannel';
     const chaincodeName = 'basic';
 
-    const walletPath = path.join(process.cwd(), 'wallet');
+    const walletPath = path.join(process.cwd(), 'wallet'+orgInput);
     const wallet = await Wallets.newFileSystemWallet(walletPath);
     console.log(`Wallet path: ${walletPath}`);
 
@@ -51,7 +50,7 @@ async function main() {
 
     await gateway.connect(ccp, {
       wallet: wallet,
-      identity: 'appUser',
+      identity: 'appUser'+orgInput,
       discovery: { enabled: true, asLocalhost: true },
     });
 
@@ -62,29 +61,9 @@ async function main() {
     var items_wishlist = [];
 
     // Create a event listener on AddToMarket Event, check if the item is in items_wishlist, if yes, call BuyFromMarket
-    // const listener = async (err, event, blockNumber, transactionId, status) => {
-    //   if (err) {
-    //     console.error(err);
-    //     return;
-    //   }
-    //   // Get the payload from the chaincode event
-    //   let event_payload = event.payload.toString();
-    //   console.log(event_payload);
-    //   // Check if the item is in items_wishlist, if yes, call BuyFromMarket
-    //   if (items_wishlist.includes(event_payload)) {
-    //     await BuyFromMarket(contract, ['BuyFromMarket', event_payload]);
-    //   }
-    // }
-
     await contract.addContractListener(async (event) => {
-      // console.log('Inside listener');
-      // if (err) {
-      //   console.error(err);
-      //   return;
-      // }
       // Get the payload from the chaincode event
       let event_payload = event.payload.toString();
-      // console.log(event_payload);
       // Check if the item is in items_wishlist, if yes, call BuyFromMarket
       if (items_wishlist.includes(event_payload)) {
         await BuyFromMarket(contract, ['BuyFromMarket', event_payload]);
@@ -93,7 +72,6 @@ async function main() {
         items_wishlist = items_wishlist.filter(item => item !== event_payload);
         // console.log(items_wishlist);
       }
-      // console.log(`Block Number: ${blockNumber} Transaction ID: ${transactionId} Status: ${status}`);
     }, 'AddToMarket');
     
     // console.log('Added contract listener\n\n');

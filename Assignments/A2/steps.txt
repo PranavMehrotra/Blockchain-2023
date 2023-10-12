@@ -1,0 +1,14 @@
+change rootPath variables in app.js and multiuser.js (test-network directory of fabric samples)
+npm install fabric-ca-client
+npm install fabric-network
+Network Setup:
+Change directory ot roothPath directory
+./network.sh down
+./network.sh up createChannel -ca
+./network.sh deployCC -ccn basic -ccp <path-to-chaincode-implicit-directory> -ccl go -ccep "OR('Org1MSP.peer','Org2MSP.peer')"
+
+
+node multiuser.js
+node app.js
+
+repeat for org2

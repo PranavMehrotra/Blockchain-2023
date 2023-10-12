@@ -5,7 +5,10 @@ const { Wallets, Gateway } = require('fabric-network');
 const fs = require('fs');
 const path = require('path');
 const process = require('process');
-const rootPath = '/home/saransh03sharma/Desktop/fabric/fabric-samples/test-network'
+const os = require('os');
+
+const rootPath = os.homedir() + '/Desktop/BTP/Fabric/fabric-samples/test-network'
+// console.log(rootPath);
 
 async function openWallet(locPath) {
     const walletPath = path.join(process.cwd(), locPath);
@@ -70,29 +73,29 @@ async function registerUser(orgNum, wallet) {
         // Create a new CA client for interacting with the CA.
         const caInfo = ccp.certificateAuthorities[`ca.${org}.example.com`];
         const caTLSCACerts = caInfo.tlsCACerts.pem;
-        const ca = new FabricCAServices(caInfo.url, { trustedRoots: caTLSCACerts, verify: false }, caInfo.caName);
-
+        const ca = new FabricCAServices(caInfo.url);
         // Check to see if we've already enrolled the user.
         const userIdentity = await wallet.get(userName);
         if (userIdentity) {
             console.log(`An identity for the user ${userName} already exists in the wallet for ${org}`);
             return;
         }
-
+        
         // Check to see if we've already enrolled the admin user.
         const adminIdentity = await wallet.get('admin');
         if (!adminIdentity) {
             console.log(`An identity for the admin user admin${orgNum} does not exist in the wallet ${org}`);
             return;
         }
-
+        
         // build a user object for authenticating with the CA
         const provider = wallet.getProviderRegistry().getProvider(adminIdentity.type);
         const adminUser = await provider.getUserContext(adminIdentity, 'admin');
-
+        
         // Register the user, enroll the user, and import the new identity into the wallet.
+        // console.log('My Own Hell')
         const secret = await ca.register({
-            affiliation: `${org}.department`,
+            affiliation: `${org}.department1`,
             enrollmentID: userName,
             role: 'client'
         }, adminUser);
@@ -140,7 +143,7 @@ async function getGatewayAndContract(orgNum, wallet) {
         const network = await gateway.getNetwork('mychannel');
 
         // Get the contract from the network.
-        const contract = network.getContract('bst-cc');
+        const contract = network.getContract('basic');
 
         return [gateway, contract];
     } catch (error) {
@@ -168,13 +171,13 @@ async function main() {
     await registerUser(1, wallet1);
     await registerUser(2, wallet2);
 
-    const [gateway1, contract1] = await getGatewayAndContract(1, wallet1);
-    // const [gateway2, contract2] = await getGatewayAndContract(2, wallet2);
+    // const [gateway1, contract1] = await getGatewayAndContract(1, wallet1);
+    // // const [gateway2, contract2] = await getGatewayAndContract(2, wallet2);
 
-    // invokeFn(contract1, "Insert", 1);
-    // // invokeFn(contract2, "Insert", 2);
+    // // invokeFn(contract1, "Insert", 1);
+    // // // invokeFn(contract2, "Insert", 2);
 
-    await gateway1.disconnect();
+    // await gateway1.disconnect();
     // await gateway2.disconnect();
 }
 
