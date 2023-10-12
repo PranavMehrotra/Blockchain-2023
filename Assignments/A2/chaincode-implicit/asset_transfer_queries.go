@@ -38,7 +38,7 @@ func (s *SmartContract) GetBalance(ctx contractapi.TransactionContextInterface) 
 
 // GetAllItems returns all items from the client's implicit private data collection, with all the necessary access control checks
 // Returns a JSON string of all items
-func (s *SmartContract) GetAllItems(ctx contractapi.TransactionContextInterface) (string, error) {
+func (s *SmartContract) GetItem(ctx contractapi.TransactionContextInterface) (string, error) {
 	// Get the clientOrgId from the input, will be used for implicit collection, owner, and state-based endorsement policy
 	clientOrgID, err := getClientOrgID(ctx)
 	if err != nil {
@@ -115,9 +115,9 @@ func (s *SmartContract) GetItemCount(ctx contractapi.TransactionContextInterface
 	return itemCount, nil
 }
 
-// GetItemsinMarket returns all the assets in the market's public ledger, removes the balance assets from the list
+// GetItemsInMarket returns all the assets in the market's public ledger, removes the balance assets from the list
 // Returns a JSON string of all items
-func (s *SmartContract) GetItemsinMarket(ctx contractapi.TransactionContextInterface) (string, error) {
+func (s *SmartContract) GetItemsInMarket(ctx contractapi.TransactionContextInterface) (string, error) {
 	// Get all items from the implicit private data collection of the client's org
 	assetIterator, err := ctx.GetStub().GetStateByPartialCompositeKey("asset", []string{})
 	if err != nil {

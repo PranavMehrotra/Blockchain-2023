@@ -61,12 +61,6 @@ func (s *SmartContract) AddItem(ctx contractapi.TransactionContextInterface) (st
 		return "", err
 	}
 
-	// In this scenario, client is only authorized to read/write private data from its own peer, therefore verify client org id matches peer org id.
-	err = verifyClientOrgMatchesPeerOrg(clientOrgID)
-	if err != nil {
-		return "", err
-	}
-
 	// Retrieve Name, NumItems, and Price from the transient map
 	var transAsset transientAsset
 	err = json.Unmarshal(immutablePropertiesJSON, &transAsset)
@@ -144,11 +138,6 @@ func (s *SmartContract) AddBalance(ctx contractapi.TransactionContextInterface) 
 		return "", err
 	}
 	balanceKey, _ := ctx.GetStub().CreateCompositeKey("balance", []string{clientOrgID})
-	// // In this scenario, client is only authorized to update balance from its own peer, therefore verify client org id matches peer org id.
-	// err = verifyClientOrgMatchesPeerOrg(clientOrgID)
-	// if err != nil {
-	// 	return "", err
-	// }
 
 	// Retrieve Balance from the transient map
 	var transBalance transientBalance
@@ -189,12 +178,6 @@ func (s *SmartContract) AddBalance(ctx contractapi.TransactionContextInterface) 
 func (s *SmartContract) AddToMarket(ctx contractapi.TransactionContextInterface, name string, price int) (string, error) {
 	// Check if asset already exists, in private data collection of the client's org
 	clientOrgID, err := getClientOrgID(ctx)
-	if err != nil {
-		return "", err
-	}
-
-	// In this scenario, client is only authorized to read/write private data from its own peer, therefore verify client org id matches peer org id.
-	err = verifyClientOrgMatchesPeerOrg(clientOrgID)
 	if err != nil {
 		return "", err
 	}
@@ -276,6 +259,12 @@ func (s *SmartContract) AddToMarket(ctx contractapi.TransactionContextInterface,
 		if err != nil {
 			return "", fmt.Errorf("failed to put asset in public data: %v", err)
 		}
+		// Emit an event for the asset that is added to market
+		payloadAsBytes := []byte(asset.Name)
+		err = ctx.GetStub().SetEvent("AddToMarket", payloadAsBytes)
+		if err != nil {
+			return "", fmt.Errorf("failed to set event: %v", err)
+		}
 	} else {
 		return "", fmt.Errorf("asset does not exist")
 	}
@@ -287,12 +276,6 @@ func (s *SmartContract) AddToMarket(ctx contractapi.TransactionContextInterface,
 // Add asset to private ledger of buyer and remove from public data collection, also update the balance of buyer and seller
 func (s *SmartContract) BuyFromMarket(ctx contractapi.TransactionContextInterface, name string) (string, error) {
 	clientOrgID, err := getClientOrgID(ctx)
-	if err != nil {
-		return "", err
-	}
-
-	// In this scenario, client is only authorized to read/write private data from its own peer, therefore verify client org id matches peer org id.
-	err = verifyClientOrgMatchesPeerOrg(clientOrgID)
 	if err != nil {
 		return "", err
 	}

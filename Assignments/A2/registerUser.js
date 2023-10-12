@@ -10,7 +10,7 @@ const { Wallets } = require('fabric-network');
 const FabricCAServices = require('fabric-ca-client');
 const fs = require('fs');
 const path = require('path');
-const rootPath = '/home/saransh03sharma/Desktop/fabric/fabric-samples/test-network'
+const rootPath = '/home/pranav/Desktop/BTP/Fabric/fabric-samples/test-network'
 
 async function main() {
     try {

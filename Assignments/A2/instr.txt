@@ -1,5 +1,5 @@
-npm fabric-ca-client
-npm fabric-network
+npm install fabric-ca-client
+npm install fabric-network
 change rootPath variable
 node enrolAdmin.js for org1
 node registerUser.js for org1
