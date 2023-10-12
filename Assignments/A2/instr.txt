@@ -1,0 +1,8 @@
+npm fabric-ca-client
+npm fabric-network
+change rootPath variable
+node enrolAdmin.js for org1
+node registerUser.js for org1
+node app.js for org1
+
+repeat for org2
