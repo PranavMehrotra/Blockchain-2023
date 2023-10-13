@@ -22,6 +22,7 @@ npm install fabric-network
 ## Network Setup
 Navigate to the test-network directory: This directory is specified by the rootPath variable in the code.
 
+- Change the rootPath variable in both the js files before running the code. rootPath should contain the path to test-network directory
 - Start by bringing down any existing network:
 
 ```bash
