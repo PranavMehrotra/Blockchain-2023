@@ -8,6 +8,7 @@ Before you begin, ensure that you have the following prerequisites:
 
 - Hyperledger Fabric Samples repository downloaded.
 - Node.js installed on your system.
+- Go 
 
 ## Installation
 
@@ -51,7 +52,8 @@ This application is responsible for managing organization's interactions with th
 node app.js
 ```
 
-Pranav Mehrotra (20CS10085)
-Saransh Sharma (20CS30065)
-Shah Dhruv Rajendrabhai (20CS10088)
-Vivek Jaiswal (20CS10078)
+## Members:
+- Pranav Mehrotra (20CS10085)
+- Saransh Sharma (20CS30065)
+- Shah Dhruv Rajendrabhai (20CS10088)
+- Vivek Jaiswal (20CS10078)
