@@ -15,7 +15,6 @@ const items_wishlist = [];
 
 async function main() {
   try {
-    // const orgMSPID = 'Org1MSP'; // Modify with your organization's MSP ID
     /**
      * Take Organisation as input from user, give 2 options and let them enter 1 or 2
      */
@@ -67,29 +66,28 @@ async function main() {
     // Create a items_wishlist array, to which we will add items from Wishlist function and check in listener if the item is in items_wishlist
 
     const listener = async (event) => {
-      // Get the payload from the chaincode event
-      let event_payload = event.payload.toString();
-      // Check if the item is in items_wishlist, if yes, call BuyFromMarket
-      if (items_wishlist.includes(event_payload)) {
-        console.log('\nItem \'' +event_payload +'\' is added to the market and is present in wishlist, Buying the item!\n')
-        try {
-          await BuyFromMarket(contract, ['BuyFromMarket', event_payload]);
-        }
-        catch (error) {
-          console.error(`Error: ${error.message}`);
+      // If the event.eventName does not have orgMSPID, then continue
+      if (!event.eventName.includes(orgMSPID)) {
+        // Get the payload from the chaincode event
+        let event_payload = event.payload.toString();
+        // Check if the item is in items_wishlist, if yes, call BuyFromMarket
+        if (items_wishlist.includes(event_payload)) {
+          console.log('\nItem \'' +event_payload +'\' is added to the market and is present in wishlist, Buying the item!\n')
+          try {
+            await BuyFromMarket(contract, ['BuyFromMarket', event_payload]);
+          }
+          catch (error) {
+            console.error(`Error: ${error.message}`);
+            // processInput(gateway, contract, rl, items_wishlist);
+            process.stdout.write("\x1b[34mEnter Command: \x1b[0m");
+            return;
+          }
+          // Remove item from items_wishlist
+          items_wishlist.splice(items_wishlist.indexOf(event_payload), 1);
+          process.stdout.write("\x1b[34mEnter Command: \x1b[0m");
           // processInput(gateway, contract, rl, items_wishlist);
-          process.stdout.write('Enter command: ')
-          // contract.removeContractListener(listener);
-          // await contract.addContractListener(listener, 'AddToMarket');
-          return;
+          // console.log(items_wishlist);
         }
-        // Remove item from items_wishlist
-        items_wishlist.splice(items_wishlist.indexOf(event_payload), 1);
-        process.stdout.write('Enter command: ')
-        // processInput(gateway, contract, rl, items_wishlist);
-        // console.log(items_wishlist);
-        // contract.removeContractListener(listener);
-        // await contract.addContractListener(listener, 'AddToMarket');
       }
     }
     // Create a event listener on AddToMarket Event, check if the item is in items_wishlist, if yes, call BuyFromMarket
@@ -123,7 +121,7 @@ async function processInput(gateway, contract, rl){
     */
     // Use a Promise to wait for user input
     const input = await new Promise((resolve) => {
-      rl.question('Enter Command: ', (answer) => {
+      rl.question("\x1b[34mEnter Command: \x1b[0m", (answer) => {
         resolve(answer);
       });
     });
@@ -209,7 +207,7 @@ async function AddItem(contract, args) {
   transaction.setEndorsingOrganizations(orgMSPID);
 
   const response = await transaction.submit();
-  console.log(`Result: ${response.toString()}`);
+  console.log(`${response.toString()}`);
 }
 
 // Function for handling AddBalance, take contract and args(string array) as input
@@ -237,7 +235,7 @@ async function AddBalance(contract, args) {
   transaction.setTransient(transientData);
 
   const response = await transaction.submit();
-  console.log(`Result: ${response.toString()}`);
+  console.log(`${response.toString()}`);
 }
 
 // Function for handling AddToMarket, take contract and args(string array) as input, also pass args as arguments and not transient data
@@ -255,7 +253,7 @@ async function AddToMarket(contract, args) {
 
   // Submit the transaction, with arguments
   const response = await transaction.submit(args[1], args[2]);  // Name and Price
-  console.log(`Result: ${response.toString()}`);
+  console.log(`${response.toString()}`);
 }
 
 //Function for handling BuyFromMarket, take contract and args(string array) as input
@@ -273,7 +271,7 @@ async function BuyFromMarket(contract, args) {
 
   // Submit the transaction, with arguments
   const response = await transaction.submit(args[1]);  // Name
-  console.log(`Result: ${response.toString()}`);
+  console.log(`${response.toString()}`);
 }
 
 
@@ -300,7 +298,7 @@ async function GetBalance(contract) {
   // Create Transaction to GetAllItems (Query)
   const transaction = contract.createTransaction('GetBalance');
   const result = await transaction.evaluate();
-  console.log(`Result: ${result.toString()}`);
+  console.log(`${result.toString()}`);
 }
 
 // Function for handling GetItem, take contract as input
@@ -308,7 +306,7 @@ async function GetItem(contract) {
   // Create Transaction to GetItem (Query)
   const transaction = contract.createTransaction('GetItem');
   const result = await transaction.evaluate();
-  console.log(`Result: ${result.toString()}`);
+  console.log(`${result.toString()}`);
 }
 
 // Function for handling GetItemsInMarket, take contract as input
@@ -316,5 +314,5 @@ async function GetItemsInMarket(contract) {
   // Create Transaction to GetItemsInMarket (Query)
   const transaction = contract.createTransaction('GetItemsInMarket');
   const result = await transaction.evaluate();
-  console.log(`Result: ${result.toString()}`);
+  console.log(`${result.toString()}`);
 }

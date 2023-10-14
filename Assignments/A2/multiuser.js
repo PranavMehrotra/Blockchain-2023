@@ -120,47 +120,6 @@ async function registerUser(orgNum, wallet) {
     }
 }
 
-async function getGatewayAndContract(orgNum, wallet) {
-    const org = `org${orgNum}`;
-    const userName = `appUser${orgNum}`;
-    try {
-        
-        // load the network configuration
-        const ccpPath = path.resolve(rootPath, 'organizations', 'peerOrganizations', `${org}.example.com`, `connection-${org}.json`);
-        const ccp = JSON.parse(fs.readFileSync(ccpPath, 'utf8'));
-
-        const identity = await wallet.get(userName);
-        if (!identity) {
-            console.log(`An identity for the user "${userName}" does not exist in the wallet`);
-            return;
-        }
-
-        // Create a new gateway for connecting to our peer node.
-        const gateway = new Gateway();
-        await gateway.connect(ccp, { wallet, identity: userName, discovery: { enabled: true, asLocalhost: true } });
-
-        // Get the network (channel) our contract is deployed to.
-        const network = await gateway.getNetwork('mychannel');
-
-        // Get the contract from the network.
-        const contract = network.getContract('basic');
-
-        return [gateway, contract];
-    } catch (error) {
-        console.error(`Failed to get contract for ${org}: ${error}`);
-    }
-}
-
-async function invokeFn(contract, fnName, ...args) {
-    try {
-        const result = await contract.submitTransaction(fnName, args);
-        console.log('Transaction has been submitted');
-        return result;
-    } catch (error) {
-        console.error(`Failed to submit transaction: ${error}`);
-    }
-}
-
 async function main() {
     const wallet1 = await openWallet('wallet1');
     const wallet2 = await openWallet('wallet2');
@@ -171,14 +130,6 @@ async function main() {
     await registerUser(1, wallet1);
     await registerUser(2, wallet2);
 
-    // const [gateway1, contract1] = await getGatewayAndContract(1, wallet1);
-    // // const [gateway2, contract2] = await getGatewayAndContract(2, wallet2);
-
-    // // invokeFn(contract1, "Insert", 1);
-    // // // invokeFn(contract2, "Insert", 2);
-
-    // await gateway1.disconnect();
-    // await gateway2.disconnect();
 }
 
 main();

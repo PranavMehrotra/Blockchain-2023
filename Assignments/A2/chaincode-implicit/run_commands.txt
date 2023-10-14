@@ -6,7 +6,7 @@ Network Setup:
 ./network.sh down
 
 
-
+Following instructions must be used to run commands on terminal, not required for Javascript App
 Initial Setup:
 export PATH=${PWD}/../bin:$PATH
 export FABRIC_CFG_PATH=$PWD/../config/

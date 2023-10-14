@@ -115,7 +115,7 @@ func (s *SmartContract) AddItem(ctx contractapi.TransactionContextInterface) (st
 		return "", fmt.Errorf("failed to put Asset private details: %v", err)
 	}
 	// Return a concatenated string of asset Name, NumItems, and Price
-	return fmt.Sprintf("%s:%d:%d", asset.Name, asset.NumItems, asset.Price), nil
+	return fmt.Sprintf("Added item to Private Data:-\nName: %s  NumItems: %d  Price: %d  OwnerOrg: %s", asset.Name, asset.NumItems, asset.Price, asset.OwnerOrg), nil
 	// return asset.Name, nil
 }
 
@@ -130,7 +130,7 @@ func (s *SmartContract) AddBalance(ctx contractapi.TransactionContextInterface) 
 	// Asset properties must be retrieved from the transient field as they are private
 	immutablePropertiesJSON, ok := transientMap["balance"]
 	if !ok {
-		return "", fmt.Errorf("balance key not found in the transient map")
+		return "", fmt.Errorf("balance key not found in the input transient map")
 	}
 
 	clientOrgID, err := getClientOrgID(ctx)
@@ -170,7 +170,7 @@ func (s *SmartContract) AddBalance(ctx contractapi.TransactionContextInterface) 
 		return "", fmt.Errorf("failed to put asset in public data: %v", err)
 	}
 
-	return fmt.Sprintf("%d", balance), nil
+	return fmt.Sprintf("Added balance to Public Data:-\nBalance: %d  OwnerOrg: %s", balance, clientOrgID), nil
 }
 
 // AddToMarket adds the asset to the market, checks the private data collection of the client's org for the asset and
@@ -261,15 +261,15 @@ func (s *SmartContract) AddToMarket(ctx contractapi.TransactionContextInterface,
 		}
 		// Emit an event for the asset that is added to market
 		payloadAsBytes := []byte(asset.Name)
-		err = ctx.GetStub().SetEvent("AddToMarket", payloadAsBytes)
+		err = ctx.GetStub().SetEvent("AddToMarket_"+clientOrgID, payloadAsBytes)
 		if err != nil {
 			return "", fmt.Errorf("failed to set event: %v", err)
 		}
 	} else {
-		return "", fmt.Errorf("asset does not exist")
+		return "", fmt.Errorf("asset does not exist in the private data collection of the client's org")
 	}
 
-	return fmt.Sprintf("Market: %s:%d:%d:%s", asset.Name, asset.NumItems, asset.Price, asset.OwnerOrg), nil
+	return fmt.Sprintf("Enlisted item to Market:-\nName: %s  NumItems: %d  Price: %d  OwnerOrg: %s", asset.Name, asset.NumItems, asset.Price, asset.OwnerOrg), nil
 }
 
 // BuyFromMarket buys the asset from the market, checks the public data collection of the client's org for the asset and balance of buyer and
@@ -434,7 +434,7 @@ func (s *SmartContract) BuyFromMarket(ctx contractapi.TransactionContextInterfac
 		return "", fmt.Errorf("failed to put Asset private details: %v", err)
 	}
 
-	return fmt.Sprintf("Private:%s:%d:%d:%s | Market:%s:%d:%d:%s", privateAsset.Name, privateAsset.NumItems, privateAsset.Price, privateAsset.OwnerOrg, asset.Name, asset.NumItems, asset.Price, asset.OwnerOrg), nil
+	return fmt.Sprintf("Successfully bought item from Market:-\nPrivate State --> Name: %s  NumItems: %d  Price: %d  OwnerOrg: %s\nMarket State --> Name: %s  NumItems: %d  Price: %d  OwnerOrg: %s", privateAsset.Name, privateAsset.NumItems, privateAsset.Price, privateAsset.OwnerOrg, asset.Name, asset.NumItems, asset.Price, asset.OwnerOrg), nil
 
 }
 
