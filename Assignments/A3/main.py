@@ -95,6 +95,23 @@ async def run():
     # Register a DID (Verinym) for the government
     await getting_verinym(steward, government)
 
+    print("STEP3 Register DID for NAA")
+    print("\n\n\n=================================")
+    print("== NAA registering verinym  ==")
+    print('--------------------------------------')
+
+    naa = {
+        'name': 'NAA',
+        "wallet_config": json.dumps({"id": "naa_wallet"}),
+        "wallet_credentials": json.dumps({"key": "naa_wallet_key"}),
+        "pool": pool_['handle'],
+        "role": "TRUST_ANCHOR"
+    }
+
+    # Register a DID (Verinym) for the naa
+    await getting_verinym(steward, naa)
+
 # Run the asyncio event loop to execute the program
 loop = asyncio.get_event_loop()
 loop.run_until_complete(run())
+
