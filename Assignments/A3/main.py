@@ -12,6 +12,7 @@ from indy import pool, wallet, did, ledger, anoncreds
 from indy.error import IndyError, ErrorCode
 from os.path import dirname
 from indy import blob_storage
+import subprocess
 
 # Define an asynchronous function that retrieves entities (schemas, credential definitions, revocation registry definitions,
 # and revocation registries) from a ledger
@@ -272,8 +273,8 @@ async def run():
 
 
     print("\n\n--------------------------------------------\n\n")
-    # Step 1: Connect to the pool
-    print(f"STEP 1: Connect to the pool")
+    # PHASE 1: Connect to the pool
+    print(f"PHASE 1: Connect to the pool")
 
     # Print a message to indicate opening the pool ledger with its name
     print(f"Open Pool Ledger: {pool_['name']}")
@@ -288,16 +289,27 @@ async def run():
     await pool.set_protocol_version(2)
 
     
+    # Create the pool ledger configuration
     try:
         await pool.create_pool_ledger_config(pool_['name'], pool_['config'])
     except IndyError as ex:
         if ex.error_code == ErrorCode.PoolLedgerConfigAlreadyExistsError:
             pass
     
-    print("Connected to the pool successfully.")
+    # run  docker image in case it is not running
+    try:
+        command = "docker run -itd -p 9701-9708:9701-9708 mailtisen/indy_pool"
+        subprocess.run(command, shell=True,stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    except:
+        pass
 
+    # Open the pool ledger and store the returned pool handle in the dictionary
     pool_['handle'] = await pool.open_pool_ledger(pool_['name'], None)
+    print("Connected to the pool successfully.")
+    print("\n\n--------------------------------------------\n\n")
+    
 
+    print("PHASE 2: Configure Steward")
     steward = {
         "name": "Sovrin Steward",
         "wallet_config": json.dumps({"id": "sovrin_steward_wallet"}),
@@ -305,9 +317,6 @@ async def run():
         "pool": pool_['handle'],
         "seed": "000000000000000000000000Steward1"
     }
-    
-    print("\n\n--------------------------------------------\n\n")
-    print("STEP 2: Configure Steward")
     print(f'Creating a wallet for "{steward["name"]}"')
 
     # Creating a wallet for the steward and generating a DID
@@ -325,11 +334,10 @@ async def run():
 
     # Print a success message after configuring the steward
     print("Steward configured successfully.")
-
-
     print("\n\n--------------------------------------------\n\n")
-    print("STEP 3: Register DID for Government")
     
+    
+    print("PHASE 3: Register DID for Government")
     government = {
         'name': 'Government',
         "wallet_config": json.dumps({"id": "government_wallet"}),
@@ -342,11 +350,10 @@ async def run():
     # Register a DID (Verinym) for the government
     await getting_verinym(steward, government)
     print("Government registered successfully.")
-    
-    
     print("\n\n--------------------------------------------\n\n")
-    print("STEP 4: Register DID for NAA")
     
+    
+    print("PHASE 4: Register DID for NAA")
     naa = {
         'name': 'NAA',
         "wallet_config": json.dumps({"id": "naa_wallet"}),
@@ -359,10 +366,10 @@ async def run():
     # Register a DID (Verinym) for the naa
     await getting_verinym(steward, naa)
     print("NAA registered successfully.")
-
     print("\n\n--------------------------------------------\n\n")
-    print("STEP 5: Government Creates credential schema")
     
+    
+    print("PHASE 5: Government Creates credential schema")
     print("\"Government\" -> Create \"PropertyDetails\" Schema")
     PropertyDetails_details = {
         'name': 'PropertyDetails',
@@ -393,10 +400,11 @@ async def run():
     bonafide_student_id = government['bonafide_student_schema_id']
     
     print("Government schemas created successfully.")
-
-    # STEP 6: Government Creates credential definition for PropertyDetails
     print("\n\n--------------------------------------------\n\n")
-    print("STEP 6: Government Creates credential definition for PropertyDetails")
+
+
+    # PHASE 6: Government Creates credential definition for PropertyDetails
+    print("PHASE 6: Government Creates credential definition for PropertyDetails")
     print("\"Government\" -> Get the schema from the ledger")
    
     get_schema_request = await ledger.build_get_schema_request(government['did'], PropertyDetails_id)
@@ -423,9 +431,10 @@ async def run():
     await send_credential_def_to_ledger(government['did'], government['PropertyDetails_cred_def'], government['pool'], government['wallet'])
     print("Government credential definition for PropertyDetails created successfully.")
 
-    # STEP 7: NAA Creates credential definition for Bonafide
     print("\n\n--------------------------------------------\n\n")
-    print("STEP 7: NAA Creates credential definition for Bonafide")
+    
+    
+    print("PHASE 7: NAA Creates credential definition for Bonafide")
     print("\"NAA\" -> Get the schema from the ledger")
    
     # Request the schema from the ledger for Bonafide
@@ -466,11 +475,11 @@ async def run():
     # Rajesh creates and stores a Master Secret in his wallet
     print("Rajesh creates and stores a Master Secret in Wallet")
     _Rajesh['master_secret_id'] = await anoncreds.prover_create_master_secret(_Rajesh['wallet'], None)
-   
-
-    # STEP 8: Government issues PropertyDetails Credentials to Rajesh
     print("\n\n--------------------------------------------\n\n")
-    print("STEP 8: Government issues PropertyDetails Credentials to Rajesh")
+    
+
+    # PHASE 8: Government issues PropertyDetails Credentials to Rajesh
+    print("PHASE 8: Government issues PropertyDetails Credentials to Rajesh")
    
     
     # Create and send PropertyDetails credential offer from the government
@@ -534,8 +543,9 @@ async def run():
 
         
     print("\n\n--------------------------------------------\n\n")
-    print("STEP 9: NAA issues BonafideStudents Credentials to Rajesh")
-   
+    
+    
+    print("PHASE 9: NAA issues BonafideStudents Credentials to Rajesh")
     print("NAA creates and sends BonafideStudents credentail offer to Rajesh")
     naa['BonafideStudents_cred_offer'] = \
         await anoncreds.issuer_create_credential_offer(naa['wallet'],naa['bonafide_cred_def_id'])
@@ -602,6 +612,7 @@ async def run():
     await getting_verinym(steward, cbdc_bank)
     nonce = await anoncreds.generate_nonce()
 
+    # Bank creates a proof request for loan application
     cbdc_bank['loan_application_proof_request'] = json.dumps({
         'nonce': nonce,
         'name': 'Loan Application Proof Request',
@@ -648,21 +659,24 @@ async def run():
             'predicate4_referent': {
                 'name': 'student_since_year',
                 'p_type': '<=',
-                'p_value': 2023,  # Minimum year
+                'p_value': 2023,  # Maximum year
                 'restrictions': [{'cred_def_id': naa['bonafide_cred_def_id']}],
             },
         },
     })
 
+    # Rajesh gets the proof request
     print("CBDC Bank sends proof request to rajesh")
     _Rajesh['loan_application_proof_request'] = cbdc_bank["loan_application_proof_request"]
     
+    # Rajesh gets credentials for the proof request
     print('Rajesh gets credentials for the proof request')
     search_for_loan_application_proof_request = \
         await anoncreds.prover_search_credentials_for_proof_req(_Rajesh['wallet'],
                                                                 _Rajesh['loan_application_proof_request'], None)
+    
+    # Rajesh gets the credentials for the attributes in the proof request
     print(search_for_loan_application_proof_request)
-
     cred_for_attr3 = await get_credential_for_referent(search_for_loan_application_proof_request, 'attr3_referent')
     cred_for_attr4 = await get_credential_for_referent(search_for_loan_application_proof_request, 'attr4_referent')
     cred_for_attr5 = await get_credential_for_referent(search_for_loan_application_proof_request, 'attr5_referent')
@@ -671,9 +685,10 @@ async def run():
     cred_for_predicate3 = await get_credential_for_referent(search_for_loan_application_proof_request, 'predicate3_referent')
     cred_for_predicate4 = await get_credential_for_referent(search_for_loan_application_proof_request, 'predicate4_referent')
 
-
+    # Rajesh closes the credentials search
     await anoncreds.prover_close_credentials_search_for_proof_req(search_for_loan_application_proof_request)
 
+    # Rajesh creates the proof for the proof request
     _Rajesh['creds_for_loan_application_proof'] = { cred_for_attr3['referent']: cred_for_attr3,
                                                     cred_for_attr4['referent']: cred_for_attr4,
                                                     cred_for_attr5['referent']: cred_for_attr5,
@@ -684,6 +699,7 @@ async def run():
     
     print(_Rajesh['creds_for_loan_application_proof'])
 
+    # Rajesh gets the schemas, credential definitions and revocation registries for the proof request
     _Rajesh['schemas_for_loan_application'], _Rajesh['cred_defs_for_loan_application'], \
     _Rajesh['revoc_states_for_loan_application'] = \
         await prover_get_entities_from_ledger(_Rajesh['pool'], _Rajesh['did'],
@@ -691,6 +707,7 @@ async def run():
     
     print("\"Rajesh creates loan application proof")
 
+    # Rajesh creates the proof
     _Rajesh['loan_application_requested_creds'] = json.dumps({
         'self_attested_attributes': {
             "attr1_referent": "Rajesh",
@@ -711,6 +728,7 @@ async def run():
         }
     })
 
+    # Rajesh creates the proof
     try:
         _Rajesh['loan_application_proof'] = await anoncreds.prover_create_proof(_Rajesh['wallet'], _Rajesh['loan_application_proof_request'],
                                         _Rajesh['loan_application_requested_creds'], _Rajesh['master_secret_id'],
@@ -726,7 +744,9 @@ async def run():
     cbdc_bank['loan_application_proof'] = _Rajesh['loan_application_proof']
 
     print("\n\n--------------------------------------------\n\n")
-    print("STEP 10: Bank validates Rajesh Claims")
+    
+    
+    print("PHASE 10: Bank validates Rajesh Claims")
 
     job_application_proof_object = json.loads(cbdc_bank['loan_application_proof'])
 
@@ -736,24 +756,23 @@ async def run():
                                                 job_application_proof_object['identifiers'], cbdc_bank['name'])
     
     print("\"CBDC Bank\" -> Verify \"Loan Application\" proof from Rajesh")
-    assert 'Rajesh' == \
-           job_application_proof_object['requested_proof']['self_attested_attrs']['attr1_referent']
-    assert 'Kumar' == \
-              job_application_proof_object['requested_proof']['self_attested_attrs']['attr2_referent']
-    assert 'Pilot Training Programme' == \
-                job_application_proof_object['requested_proof']['revealed_attrs']['attr3_referent']['raw']
-    assert 'Malancha Road, Kharagpur' == \
-                job_application_proof_object['requested_proof']['revealed_attrs']['attr4_referent']['raw']
-    assert '2010' == \
-                job_application_proof_object['requested_proof']['revealed_attrs']['attr5_referent']['raw']
     
-    assert await anoncreds.verifier_verify_proof(cbdc_bank['loan_application_proof_request'], cbdc_bank['loan_application_proof'],
+    # Verify the proof provided by Rajesh
+    try:
+        assert 'Rajesh' == job_application_proof_object['requested_proof']['self_attested_attrs']['attr1_referent']
+        assert 'Kumar' == job_application_proof_object['requested_proof']['self_attested_attrs']['attr2_referent']
+        assert 'Pilot Training Programme' == job_application_proof_object['requested_proof']['revealed_attrs']['attr3_referent']['raw']
+        assert 'Malancha Road, Kharagpur' == job_application_proof_object['requested_proof']['revealed_attrs']['attr4_referent']['raw']
+        assert '2010' == job_application_proof_object['requested_proof']['revealed_attrs']['attr5_referent']['raw']
+
+        assert await anoncreds.verifier_verify_proof(cbdc_bank['loan_application_proof_request'], cbdc_bank['loan_application_proof'],
                                                 cbdc_bank['schemas_for_loan_application'],
                                                 cbdc_bank['cred_defs_for_loan_application'],
                                                 cbdc_bank['revoc_ref_defs_for_loan_application'],
                                                 cbdc_bank['revoc_regs_for_loan_application'])
-    
-
+        print("Verification of proof successful!!")
+    except AssertionError as e:
+        print("Proof Verification Failed!!")
 
 # Run the asyncio event loop to execute the program
 loop = asyncio.get_event_loop()
